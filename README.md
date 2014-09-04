@@ -2,16 +2,6 @@
 
 Functional programming tools with close integration with JavaScript.
 
-[![build status](https://secure.travis-ci.org/kklimuk/functools.png)](http://travis-ci.org/kklimuk/functools)
-
-## Installation
-
-This module is installed via npm:
-
-``` bash
-$ npm install functools
-```
-
 ## Motivating Examples
 
 ### Finding the value of a query string param
