@@ -4,8 +4,7 @@ var Maybe = require('./maybe');
 Object.defineProperties(Array, {
     "isArray": { // credit: Douglas Crockford
         value: function (value) {
-            return value &&
-                typeof value === 'object' &&
+            return value && typeof value === 'object' &&
                 typeof value.length === 'number' &&
                 typeof value.splice === 'function' && !(value.propertyIsEnumerable('length'));
         }
