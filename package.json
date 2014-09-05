@@ -10,7 +10,9 @@
     "type": "git",
     "url": "https://github.com/kklimuk/functionalify"
   },
-  "keywords": ["functional programming"],
+  "keywords": [
+    "functional programming"
+  ],
   "author": "Kirill Klimuk <kklimuk@gmail.com>",
   "license": "MIT",
   "bugs": {
@@ -24,6 +26,7 @@
     "grunt": "~0.4.1",
     "grunt-mocha-cli": "~1.1.0",
     "grunt-complexity": "~0.1.3",
-    "grunt-cli": "~0.1.9"
+    "grunt-cli": "~0.1.9",
+    "grunt-browserify": "^3.0.1"
   }
 }
