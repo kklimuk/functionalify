@@ -1,4 +1,4 @@
-# functools
+# functionalify
 
 Functional programming tools with close integration with JavaScript.
 
@@ -10,7 +10,7 @@ var functools = require("./index");
 ## Motivation
 JavaScript provides us with first-class functions to build great functional programs.
 Unfortunately, it also doesn't provide us with either the data structures or the methods to do so.
-Functools fills in these holes by:
+functionalify fills in these holes by:
 
 1. Adding immutable, monadic, and other operations and useful to existing data structures (arrays and objects).
     * Yes, modifying prototypes is considered a no-no. But now you can use existing APIs in a functional way.

@@ -1,5 +1,5 @@
 {
-  "name": "functools",
+  "name": "functionalify",
   "version": "0.0.1",
   "description": "Functional programming tools with close integration with JavaScript.",
   "main": "index.js",
@@ -8,13 +8,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kklimuk/functools"
+    "url": "https://github.com/kklimuk/functionalify"
   },
   "keywords": ["functional programming"],
   "author": "Kirill Klimuk <kklimuk@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kklimuk/functools/issues"
+    "url": "https://github.com/kklimuk/functionalify/issues"
   },
   "dependencies": {},
   "devDependencies": {
