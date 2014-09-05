@@ -2,9 +2,14 @@
 
 Functional programming tools with close integration with JavaScript.
 
+## Installation
+```sh
+npm install functionalify
+```
+
 ## Sample Usage
 ```js
-var functools = require("./index");
+var functionalify = require("functionalify");
 ```
 
 ## Motivation
