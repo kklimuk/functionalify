@@ -49,10 +49,3 @@ const evensAndOdds = (10).times.groupBy(function(val) {
 ```js
 Array.from(document.querySelectorAll("p")) // Array[HTMLElement]
 ```
-
-- `isArray(array:Array)`
-    - returns array
-
-```js
-Array.from(document.querySelectorAll("p")) // Array[HTMLElement]
-```
