@@ -33,13 +33,15 @@ var mapper = function (mapping) {
 
 Object.defineProperties(Object.prototype, {
     "map": {
-        value: mapper(functools.identity)
+        value: mapper(functools.identity),
+        writable: true
     },
 
     "flatMap": {
         value: mapper(function (value) {
             return functools.hasFlatMap(value) ? value.flatMap(functools.identity) : value;
-        })
+        }),
+        writable: true
     },
 
     "filter": {
@@ -51,6 +53,7 @@ Object.defineProperties(Object.prototype, {
                 }
             }
             return result;
-        }
+        },
+        writable: true
     }
 });
