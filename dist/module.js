@@ -294,7 +294,7 @@ var mapper = function (mapping) {
 
         for (var key in this) {
             if (this.hasOwnProperty(key)) {
-                var value = func([key, this[key]]);
+                var value = func(this[key], key, this);
                 if (Array.isArray(value) && value.length === 2) {
                     result[value[0]] = mapping(value[1]);
                 } else {
@@ -309,13 +309,21 @@ var mapper = function (mapping) {
 
 Object.defineProperties(Object.prototype, {
     "map": {
-        value: mapper(functools.identity)
+        value: mapper(functools.identity),
+        writable: true
+    },
+
+    "forEach": {
+        value: function () {
+            mapper(functools.identity);
+        }
     },
 
     "flatMap": {
         value: mapper(function (value) {
             return functools.hasFlatMap(value) ? value.flatMap(functools.identity) : value;
-        })
+        }),
+        writable: true
     },
 
     "filter": {
@@ -327,7 +335,8 @@ Object.defineProperties(Object.prototype, {
                 }
             }
             return result;
-        }
+        },
+        writable: true
     }
 });
 },{"./common":2}],6:[function(require,module,exports){
@@ -344,4 +353,20 @@ Object.defineProperties(String.prototype, {
         }
     }
 });
-},{}]},{},[1,2,3,4,5,6]);
+},{}],7:[function(require,module,exports){
+require('./app/array');
+require('./app/object');
+require('./app/string');
+require('./app/number');
+
+var functools = {
+    common: require('./app/common'),
+    Maybe: require('./app/maybe')
+};
+
+if (typeof window !== 'undefined') {
+    window.functools = functools;
+}
+
+module.exports = functools;
+},{"./app/array":1,"./app/common":2,"./app/maybe":3,"./app/number":4,"./app/object":5,"./app/string":6}]},{},[7,1,2,3,4,5,6]);
