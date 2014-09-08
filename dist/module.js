@@ -184,13 +184,15 @@ Object.defineProperties(Array.prototype, {
 
     "prepend": {
         value: function () {
-            return Array.from(arguments).concat(this);
+            this.unshift.apply(this, arguments);
+            return this;
         }
     },
 
     "append": {
         value: function () {
-            return this.concat(Array.from(arguments));
+            this.push.apply(this, arguments);
+            return this;
         }
     }
 });
@@ -359,14 +361,14 @@ require('./app/object');
 require('./app/string');
 require('./app/number');
 
-var functools = {
+var functionalify = {
     common: require('./app/common'),
     Maybe: require('./app/maybe')
 };
 
 if (typeof window !== 'undefined') {
-    window.functools = functools;
+    window.functionalify = functionalify;
 }
 
-module.exports = functools;
+module.exports = functionalify;
 },{"./app/array":1,"./app/common":2,"./app/maybe":3,"./app/number":4,"./app/object":5,"./app/string":6}]},{},[7,1,2,3,4,5,6]);
