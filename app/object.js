@@ -37,7 +37,7 @@ Object.defineProperties(Object.prototype, {
         writable: true
     },
 
-    "forEach": {
+    "foreach": {
         value: function () {
             mapper(functools.identity);
         }
