@@ -184,15 +184,13 @@ Object.defineProperties(Array.prototype, {
 
     "prepend": {
         value: function () {
-            this.unshift.apply(this, arguments);
-            return this;
+            return this.push(arguments).concat(this);
         }
     },
 
     "append": {
         value: function () {
-            this.push.apply(this, arguments);
-            return this;
+            return this.concat(Array.from(arguments));
         }
     }
 });
@@ -290,7 +288,7 @@ Object.defineProperty(Object, "zip", {
     }
 });
 
-var mapper = function (mapping) {
+var mapper = function (mapping, ignoreError) {
     return function (func) {
         var result = {};
 
@@ -299,7 +297,7 @@ var mapper = function (mapping) {
                 var value = func(this[key], key, this);
                 if (Array.isArray(value) && value.length === 2) {
                     result[value[0]] = mapping(value[1]);
-                } else {
+                } else if (!ignoreError) {
                     throw "Invalid mapper error. Needed [key, value], got " + JSON.stringify(value) + ".";
                 }
             }
@@ -317,8 +315,9 @@ Object.defineProperties(Object.prototype, {
 
     "foreach": {
         value: function () {
-            mapper(functools.identity);
-        }
+            mapper(functools.identity, true).apply(this, arguments);
+        },
+        writable: true
     },
 
     "flatMap": {
