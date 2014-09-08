@@ -46,8 +46,9 @@ Object.defineProperties(Object.prototype, {
 
     "values": {
         get: function () {
+            var self = this;
             return Object.keys(this).map(function (key) {
-                return this[key];
+                return self[key];
             });
         }
     },
