@@ -359,7 +359,7 @@ Object.defineProperties(Object.prototype, {
         value: function (func) {
             var result = {};
             for (var key in this) {
-                if (this.hasOwnProperty(key) && func([key, this[key]])) {
+                if (this.hasOwnProperty(key) && func(this[key], key, this)) {
                     result[key] = this[key];
                 }
             }
