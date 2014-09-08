@@ -183,13 +183,15 @@ Object.defineProperties(Array.prototype, {
 
     "prepend": {
         value: function () {
-            return Array.from(arguments).concat(this);
+            this.unshift.apply(this, arguments);
+            return this;
         }
     },
 
     "append": {
         value: function () {
-            return this.concat(Array.from(arguments));
+            this.push.apply(this, arguments);
+            return this;
         }
     }
 });
