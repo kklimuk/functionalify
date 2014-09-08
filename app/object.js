@@ -40,7 +40,8 @@ Object.defineProperties(Object.prototype, {
     "foreach": {
         value: function () {
             mapper(functools.identity);
-        }
+        },
+        writable: true
     },
 
     "flatMap": {
