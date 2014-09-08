@@ -34,12 +34,21 @@ var mapper = function (mapping, ignoreError) {
 Object.defineProperties(Object.prototype, {
     "isEmpty": {
         get: function () {
-            for (var key in this) {
-                if (this.hasOwnProperty(key)) {
-                    return false;
-                }
-            }
-            return true;
+            return Object.keys(this).length === 0;
+        }
+    },
+
+    "keys": {
+        get: function () {
+            return Object.keys(this);
+        }
+    },
+
+    "values": {
+        get: function () {
+            return Object.keys(this).map(function (key) {
+                return this[key];
+            });
         }
     },
 
