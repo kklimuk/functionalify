@@ -18,9 +18,9 @@ var mapper = function (mapping) {
 
         for (var key in this) {
             if (this.hasOwnProperty(key)) {
-                var value = func([key, this[key]]);
+                var value = func(this[key], key, this);
                 if (Array.isArray(value) && value.length === 2) {
-                    result[value[0]] = mapping(value[1], value[0]);
+                    result[value[0]] = mapping(value[1]);
                 } else {
                     throw "Invalid mapper error. Needed [key, value], got " + JSON.stringify(value) + ".";
                 }
@@ -35,6 +35,12 @@ Object.defineProperties(Object.prototype, {
     "map": {
         value: mapper(functools.identity),
         writable: true
+    },
+
+    "forEach": {
+        value: function () {
+            mapper(functools.identity);
+        }
     },
 
     "flatMap": {
