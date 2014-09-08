@@ -9,7 +9,7 @@ var functionalify = {
 };
 
 if (typeof window !== 'undefined') {
-    window.functools = functionalify;
+    window.functionalify = functionalify;
 }
 
 module.exports = functionalify;
