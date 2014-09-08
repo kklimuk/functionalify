@@ -325,6 +325,12 @@ Object.defineProperties(Object.prototype, {
         }
     },
 
+    "pairs": {
+        get: function () {
+            return this.keys.zip(this.values);
+        }
+    },
+
     "keys": {
         get: function () {
             return Object.keys(this);
