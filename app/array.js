@@ -13,7 +13,6 @@ Object.defineProperties(Array, {
     "from": {
         value: function (value, mapper, thisArg) {
             var array = Array.prototype.slice.call(value);
-
             if (typeof mapper !== 'undefined') {
                 return array.map(mapper, thisArg);
             }
@@ -183,7 +182,7 @@ Object.defineProperties(Array.prototype, {
 
     "prepend": {
         value: function () {
-            return this.push(arguments).concat(this);
+            return Array.from(arguments).concat(this);
         }
     },
 
