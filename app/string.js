@@ -1,13 +1,11 @@
-Object.defineProperties(String.prototype, {
-    "contains": {
-        value: function (string) {
-            return !!~this.indexOf(string);
-        }
-    },
+var functools = require('./common');
 
-    "startswith": {
-        value: function (string) {
-            return this.indexOf(string) === 0;
-        }
-    }
+Object.defineProperties(String.prototype, {
+    "contains": functools.makeProperty('value', function (string) {
+        return !!~this.indexOf(string);
+    }),
+
+    "startswith": functools.makeProperty('value', function (string) {
+        return this.indexOf(string) === 0;
+    })
 });

@@ -32,68 +32,46 @@ var mapper = function (mapping, ignoreError) {
 };
 
 Object.defineProperties(Object.prototype, {
-    "isEmpty": {
-        get: function () {
-            return Object.keys(this).length === 0;
-        }
-    },
+    "isEmpty": functools.makeProperty('get', function () {
+        return Object.keys(this).length === 0;
+    }),
 
-    "pairs": {
-        get: function () {
-            return this.keys.zip(this.values);
-        }
-    },
+    "nonEmpty": functools.makeProperty('get', function () {
+        return !this.isEmpty;
+    }),
 
-    "keys": {
-        get: function () {
-            return Object.keys(this);
-        }
-    },
+    "pairs": functools.makeProperty('get', function () {
+        return this.keys.zip(this.values);
+    }),
 
-    "values": {
-        get: function () {
-            var self = this;
-            return Object.keys(this).map(function (key) {
-                return self[key];
-            });
-        }
-    },
+    "keys": functools.makeProperty('get', function () {
+        return Object.keys(this);
+    }),
 
-    "nonEmpty": {
-        get: function () {
-            return !this.isEmpty;
-        }
-    },
+    "values": functools.makeProperty('get', function () {
+        var self = this;
+        return Object.keys(this).map(function (key) {
+            return self[key];
+        });
+    }),
 
-    "map": {
-        value: mapper(functools.identity),
-        writable: true
-    },
+    "map": functools.makeProperty('value', mapper(functools.identity)),
 
-    "foreach": {
-        value: function () {
-            mapper(functools.identity, true).apply(this, arguments);
-        },
-        writable: true
-    },
+    "foreach": functools.makeProperty('value', function () {
+        mapper(functools.identity, true).apply(this, arguments);
+    }),
 
-    "flatMap": {
-        value: mapper(function (value) {
-            return functools.hasFlatMap(value) ? value.flatMap(functools.identity) : value;
-        }),
-        writable: true
-    },
+    "flatMap": functools.makeProperty('value', mapper(function (value) {
+        return functools.hasFlatMap(value) ? value.flatMap(functools.identity) : value;
+    })),
 
-    "filter": {
-        value: function (func) {
-            var result = {};
-            for (var key in this) {
-                if (this.hasOwnProperty(key) && func(this[key], key, this)) {
-                    result[key] = this[key];
-                }
+    "filter": functools.makeProperty('value', function (func) {
+        var result = {};
+        for (var key in this) {
+            if (this.hasOwnProperty(key) && func(this[key], key, this)) {
+                result[key] = this[key];
             }
-            return result;
-        },
-        writable: true
-    }
+        }
+        return result;
+    })
 });

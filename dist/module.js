@@ -24,186 +24,144 @@ Object.defineProperties(Array, {
 });
 
 Object.defineProperties(Array.prototype, {
-    "isEmpty": {
-        get: function () {
-            return this.length === 0;
+    "isEmpty": functools.makeProperty('get', function () {
+        return this.length === 0;
+    }),
+
+    "nonEmpty": functools.makeProperty('get', function () {
+        return !this.isEmpty;
+    }),
+
+    "flatMap": functools.makeProperty('value', function (func) {
+        return this.map(func).flatten();
+    }),
+
+    "flatten": functools.makeProperty('value', function () {
+        var result = [];
+
+        for (var i = 0, length = this.length; i < length; i++) {
+            if (functools.hasFlatMap(this[i])) {
+                result.push.apply(result, this[i].flatMap(functools.identity));
+            } else {
+                result.push(this[i]);
+            }
         }
-    },
 
-    "nonEmpty": {
-        get: function () {
-            return !this.isEmpty;
+        return result;
+    }),
+
+    "head": functools.makeProperty('get', function () {
+        return Maybe(this[0]);
+    }),
+
+    "last": functools.makeProperty('get', function () {
+        return this.length === 0 ? Maybe.None() : Maybe(this[this.length - 1]);
+    }),
+
+    "init": functools.makeProperty('get', function () {
+        return this.length === 0 ? [] : this.slice(0, this.length - 1);
+    }),
+
+    "tail": functools.makeProperty('get', function () {
+        return this.length === 0 ? [] : this.slice(1);
+    }),
+
+    "take": functools.makeProperty('value', function (num) {
+        return this.slice(0, num);
+    }),
+
+    "drop": functools.makeProperty('value', function (num) {
+        return this.slice(num);
+    }),
+
+    "partition": functools.makeProperty('value', function (func) {
+        var a = [], b = [];
+        for (var i = 0, length = this.length; i < length; i++) {
+            func(this[i]) ? a.push(this[i]) : b.push(this[i]);
         }
-    },
+        return [a, b];
+    }),
 
-    "flatMap": {
-        value: function (func) {
-            return this.map(func).flatten();
+    "takeWhile": functools.makeProperty('value', function (func) {
+        for (var i = 0, length = this.length; i < length; i++) {
+            if (!func(this[i])) {
+                return this.slice(0, i);
+            }
         }
-    },
+        return this.slice(0);
+    }),
 
-    "flatten": {
-        value: function () {
-            var result = [];
+    "dropWhile": functools.makeProperty('value', function (func) {
+        for (var i = 0, length = this.length; i < length; i++) {
+            if (!func(this[i])) {
+                return this.slice(i);
+            }
+        }
+        return [];
+    }),
 
-            for (var i = 0, length = this.length; i < length; i++) {
-                if (functools.hasFlatMap(this[i])) {
-                    result.push.apply(result, this[i].flatMap(functools.identity));
-                } else {
-                    result.push(this[i]);
-                }
+    "every": functools.makeProperty('value', function (func) {
+        for (var i = 0, length = this.length; i < length; i++) {
+            if (!func(this[i])) {
+                return false;
+            }
+        }
+        return true;
+    }),
+
+    "any": functools.makeProperty('value', function (func) {
+        for (var i = 0, length = this.length; i < length; i++) {
+            if (func(this[i])) {
+                return true;
+            }
+        }
+
+        return false;
+    }),
+
+    "find": functools.makeProperty('value', function (func) {
+        for (var i = 0, length = this.length; i < length; i++) {
+            if (func(this[i])) {
+                return Maybe(this[i]);
+            }
+        }
+
+        return Maybe.None();
+    }),
+
+    "contains": functools.makeProperty('value', function (func) {
+        return this.find(func) !== Maybe.None();
+    }),
+
+    "zip": functools.makeProperty('value', function (other) {
+        var arrayToZip = other.length < this.length ? other : this,
+            otherArray = this === arrayToZip ? other : this;
+
+        return arrayToZip.map(function (el, index) {
+            return [el, otherArray[index]];
+        });
+    }),
+
+    "groupBy": functools.makeProperty('value', function (func) {
+        var result = {};
+        for (var i = 0, length = this.length; i < length; i++) {
+            var key = func(this[i]);
+            if (!(key in result)) {
+                result[key] = [];
             }
 
-            return result;
+            result[key].push(this[i]);
         }
-    },
+        return result;
+    }),
 
-    "head": {
-        get: function () {
-            return Maybe(this[0]);
-        }
-    },
+    "prepend": functools.makeProperty('value', function () {
+        return Array.from(arguments).concat(this);
+    }),
 
-    "last": {
-        get: function () {
-            return this.length === 0 ? Maybe.None() : Maybe(this[this.length - 1]);
-        }
-    },
-
-    "init": {
-        get: function () {
-            return this.length === 0 ? [] : this.slice(0, this.length - 1);
-        }
-    },
-
-    "tail": {
-        get: function () {
-            return this.length === 0 ? [] : this.slice(1);
-        }
-    },
-
-    "take": {
-        value: function (num) {
-            return this.slice(0, num);
-        }
-    },
-
-    "drop": {
-        value: function (num) {
-            return this.slice(num);
-        }
-    },
-
-    "partition": {
-        value: function (func) {
-            var a = [], b = [];
-            for (var i = 0, length = this.length; i < length; i++) {
-                func(this[i]) ? a.push(this[i]) : b.push(this[i]);
-            }
-            return [a, b];
-        }
-    },
-
-    "takeWhile": {
-        value: function (func) {
-            for (var i = 0, length = this.length; i < length; i++) {
-                if (!func(this[i])) {
-                    return this.slice(0, i);
-                }
-            }
-            return this.slice(0);
-        }
-    },
-
-    "dropWhile": {
-        value: function (func) {
-            for (var i = 0, length = this.length; i < length; i++) {
-                if (!func(this[i])) {
-                    return this.slice(i);
-                }
-            }
-            return [];
-        }
-    },
-
-    "every": {
-        value: function (func) {
-            for (var i = 0, length = this.length; i < length; i++) {
-                if (!func(this[i])) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    },
-
-    "any": {
-        value: function (func) {
-            for (var i = 0, length = this.length; i < length; i++) {
-                if (func(this[i])) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    },
-
-    "find": {
-        value: function (func) {
-            for (var i = 0, length = this.length; i < length; i++) {
-                if (func(this[i])) {
-                    return Maybe(this[i]);
-                }
-            }
-
-            return Maybe.None();
-        }
-    },
-
-    "contains": {
-        value: function (func) {
-            return this.find(func) !== Maybe.None();
-        }
-    },
-
-    "zip": {
-        value: function (other) {
-            var arrayToZip = other.length < this.length ? other : this,
-                otherArray = this === arrayToZip ? other : this;
-
-            return arrayToZip.map(function (el, index) {
-                return [el, otherArray[index]];
-            });
-        }
-    },
-
-    "groupBy": {
-        value: function (func) {
-            var result = {};
-            for (var i = 0, length = this.length; i < length; i++) {
-                var key = func(this[i]);
-                if (!(key in result)) {
-                    result[key] = [];
-                }
-
-                result[key].push(this[i]);
-            }
-            return result;
-        }
-    },
-
-    "prepend": {
-        value: function () {
-            return Array.from(arguments).concat(this);
-        }
-    },
-
-    "append": {
-        value: function () {
-            return this.concat(Array.from(arguments));
-        }
-    }
+    "append": functools.makeProperty('value', function () {
+        return this.concat(Array.from(arguments));
+    })
 });
 },{"./common":2,"./maybe":3}],2:[function(require,module,exports){
 module.exports = {
@@ -211,6 +169,14 @@ module.exports = {
     noop: function () {},
     hasFlatMap: function (val) {
         return (typeof val === "object" || typeof val === "function") && typeof val.flatMap === "function";
+    },
+    makeProperty: function (type, func) {
+        var prop = {
+            writable: true
+        };
+        prop[type] = func;
+
+        return prop;
     }
 };
 },{}],3:[function(require,module,exports){
@@ -273,18 +239,20 @@ function None() {
 
 module.exports = Maybe;
 },{"./common":2}],4:[function(require,module,exports){
+var functools = require('./common');
+
 Object.defineProperties(Number.prototype, {
-    "times": {
-        get: function () {
-            var result = [];
-            for (var i = 0; i < this; i++) {
-                result.push(i);
-            }
-            return result;
+    "times": functools.makeProperty('value', function () {
+        var result = [];
+
+        for (var i = 0; i < this; i++) {
+            result.push(i);
         }
-    }
+
+        return result;
+    })
 });
-},{}],5:[function(require,module,exports){
+},{"./common":2}],5:[function(require,module,exports){
 var functools = require('./common');
 
 Object.defineProperty(Object, "zip", {
@@ -319,86 +287,62 @@ var mapper = function (mapping, ignoreError) {
 };
 
 Object.defineProperties(Object.prototype, {
-    "isEmpty": {
-        get: function () {
-            return Object.keys(this).length === 0;
-        }
-    },
+    "isEmpty": functools.makeProperty('get', function () {
+        return Object.keys(this).length === 0;
+    }),
 
-    "pairs": {
-        get: function () {
-            return this.keys.zip(this.values);
-        }
-    },
+    "nonEmpty": functools.makeProperty('get', function () {
+        return !this.isEmpty;
+    }),
 
-    "keys": {
-        get: function () {
-            return Object.keys(this);
-        }
-    },
+    "pairs": functools.makeProperty('get', function () {
+        return this.keys.zip(this.values);
+    }),
 
-    "values": {
-        get: function () {
-            var self = this;
-            return Object.keys(this).map(function (key) {
-                return self[key];
-            });
-        }
-    },
+    "keys": functools.makeProperty('get', function () {
+        return Object.keys(this);
+    }),
 
-    "nonEmpty": {
-        get: function () {
-            return !this.isEmpty;
-        }
-    },
+    "values": functools.makeProperty('get', function () {
+        var self = this;
+        return Object.keys(this).map(function (key) {
+            return self[key];
+        });
+    }),
 
-    "map": {
-        value: mapper(functools.identity),
-        writable: true
-    },
+    "map": functools.makeProperty('value', mapper(functools.identity)),
 
-    "foreach": {
-        value: function () {
-            mapper(functools.identity, true).apply(this, arguments);
-        },
-        writable: true
-    },
+    "foreach": functools.makeProperty('value', function () {
+        mapper(functools.identity, true).apply(this, arguments);
+    }),
 
-    "flatMap": {
-        value: mapper(function (value) {
-            return functools.hasFlatMap(value) ? value.flatMap(functools.identity) : value;
-        }),
-        writable: true
-    },
+    "flatMap": functools.makeProperty('value', mapper(function (value) {
+        return functools.hasFlatMap(value) ? value.flatMap(functools.identity) : value;
+    })),
 
-    "filter": {
-        value: function (func) {
-            var result = {};
-            for (var key in this) {
-                if (this.hasOwnProperty(key) && func(this[key], key, this)) {
-                    result[key] = this[key];
-                }
+    "filter": functools.makeProperty('value', function (func) {
+        var result = {};
+        for (var key in this) {
+            if (this.hasOwnProperty(key) && func(this[key], key, this)) {
+                result[key] = this[key];
             }
-            return result;
-        },
-        writable: true
-    }
+        }
+        return result;
+    })
 });
 },{"./common":2}],6:[function(require,module,exports){
-Object.defineProperties(String.prototype, {
-    "contains": {
-        value: function (string) {
-            return !!~this.indexOf(string);
-        }
-    },
+var functools = require('./common');
 
-    "startswith": {
-        value: function (string) {
-            return this.indexOf(string) === 0;
-        }
-    }
+Object.defineProperties(String.prototype, {
+    "contains": functools.makeProperty('value', function (string) {
+        return !!~this.indexOf(string);
+    }),
+
+    "startswith": functools.makeProperty('value', function (string) {
+        return this.indexOf(string) === 0;
+    })
 });
-},{}],7:[function(require,module,exports){
+},{"./common":2}],7:[function(require,module,exports){
 require('./app/array');
 require('./app/object');
 require('./app/string');
