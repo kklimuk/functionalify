@@ -23,6 +23,18 @@ Object.defineProperties(Array, {
 });
 
 Object.defineProperties(Array.prototype, {
+    "isEmpty": {
+        get: function () {
+            return this.length === 0;
+        }
+    },
+
+    "nonEmpty": {
+        get: function () {
+            return !this.isEmpty;
+        }
+    },
+
     "flatMap": {
         value: function (func) {
             return this.map(func).flatten();

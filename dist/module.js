@@ -24,6 +24,18 @@ Object.defineProperties(Array, {
 });
 
 Object.defineProperties(Array.prototype, {
+    "isEmpty": {
+        get: function () {
+            return this.length === 0;
+        }
+    },
+
+    "nonEmpty": {
+        get: function () {
+            return !this.isEmpty;
+        }
+    },
+
     "flatMap": {
         value: function (func) {
             return this.map(func).flatten();
@@ -307,6 +319,23 @@ var mapper = function (mapping, ignoreError) {
 };
 
 Object.defineProperties(Object.prototype, {
+    "isEmpty": {
+        get: function () {
+            for (var key in this) {
+                if (this.hasOwnProperty(key)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    },
+
+    "nonEmpty": {
+        get: function () {
+            return !this.isEmpty;
+        }
+    },
+
     "map": {
         value: mapper(functools.identity),
         writable: true
