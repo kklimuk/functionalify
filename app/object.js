@@ -20,7 +20,7 @@ var mapper = function (mapping) {
             if (this.hasOwnProperty(key)) {
                 var value = func([key, this[key]]);
                 if (Array.isArray(value) && value.length === 2) {
-                    result[value[0]] = mapping(value[0], value[1]);
+                    result[value[0]] = mapping(value[1], value[0]);
                 } else {
                     throw "Invalid mapper error. Needed [key, value], got " + JSON.stringify(value) + ".";
                 }
