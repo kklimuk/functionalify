@@ -177,12 +177,14 @@ module.exports = {
     makeProperty: function (type, func) {
         if (type === 'get') {
             return {
-                get: func
+                get: func,
+                enumerable: false
             }
         }
         return {
             writable: true,
-            value: func
+            value: func,
+            enumerable: false
         };
     }
 };
