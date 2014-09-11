@@ -1,0 +1,23 @@
+{
+  "name": "functionalify",
+  "main": "index.js",
+  "version": "0.0.2",
+  "homepage": "https://github.com/kklimuk/functionalify",
+  "authors": [
+    "Kirill Klimuk <kklimuk@gmail.com>"
+  ],
+  "description": "Functional programming tools with close integration with JavaScript.",
+  "keywords": [
+    "fp",
+    "functional"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/components",
+    "test",
+    "tests"
+  ]
+}
