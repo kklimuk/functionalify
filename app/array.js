@@ -76,7 +76,8 @@ Object.defineProperties(Array.prototype, {
     "partition": functools.makeProperty('value', function (func) {
         var a = [], b = [];
         for (var i = 0, length = this.length; i < length; i++) {
-            func(this[i]) ? a.push(this[i]) : b.push(this[i]);
+            var pushTo = func(this[i]) ? a : b;
+            pushTo.push(this[i]);
         }
         return [a, b];
     }),
@@ -143,14 +144,17 @@ Object.defineProperties(Array.prototype, {
 
     "groupBy": functools.makeProperty('value', function (func) {
         var result = {};
+
         for (var i = 0, length = this.length; i < length; i++) {
             var key = func(this[i]);
+
             if (!(key in result)) {
                 result[key] = [];
             }
 
             result[key].push(this[i]);
         }
+
         return result;
     }),
 

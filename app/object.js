@@ -12,7 +12,7 @@ Object.defineProperty(Object, "zip", {
     }
 });
 
-var mapper = function (mapping, ignoreError) {
+function mapper (mapping, ignoreError) {
     return function (func) {
         var result = {};
 
@@ -28,8 +28,8 @@ var mapper = function (mapping, ignoreError) {
         }
 
         return result;
-    }
-};
+    };
+}
 
 Object.defineProperties(Object.prototype, {
     "isEmpty": functools.makeProperty('get', function () {
@@ -53,6 +53,10 @@ Object.defineProperties(Object.prototype, {
         return Object.keys(this).map(function (key) {
             return self[key];
         });
+    }),
+
+    "contains": functools.makeProperty('value', function (value) {
+        return value in this;
     }),
 
     "map": functools.makeProperty('value', mapper(functools.identity)),

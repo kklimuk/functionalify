@@ -15,7 +15,7 @@ module.exports = {
             return {
                 get: func,
                 enumerable: false
-            }
+            };
         }
         return {
             writable: true,
