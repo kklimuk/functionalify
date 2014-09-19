@@ -1,10 +1,25 @@
+function RequireFailedError (reason) {
+    this.constructor.call(this, reason);
+}
+
+RequireFailedError.prototype = Object.create(Error.prototype);
+
 module.exports = {
+    RequireFailedError: RequireFailedError,
+
+    assert: function (booleanExpression, failureMessage) {
+        if (!booleanExpression) {
+            throw new RequireFailedError(failureMessage);
+        }
+
+        return true;
+    },
+
     identity: function (value) {
         return value;
     },
 
-    noop: function () {
-    },
+    noop: function () {},
 
     hasFlatMap: function (val) {
         return (typeof val === "object" || typeof val === "function") && typeof val.flatMap === "function";
@@ -17,6 +32,7 @@ module.exports = {
                 enumerable: false
             };
         }
+
         return {
             writable: true,
             value: func,

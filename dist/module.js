@@ -77,7 +77,8 @@ Object.defineProperties(Array.prototype, {
     "partition": functools.makeProperty('value', function (func) {
         var a = [], b = [];
         for (var i = 0, length = this.length; i < length; i++) {
-            func(this[i]) ? a.push(this[i]) : b.push(this[i]);
+            var pushTo = func(this[i]) ? a : b;
+            pushTo.push(this[i]);
         }
         return [a, b];
     }),
@@ -144,14 +145,17 @@ Object.defineProperties(Array.prototype, {
 
     "groupBy": functools.makeProperty('value', function (func) {
         var result = {};
+
         for (var i = 0, length = this.length; i < length; i++) {
             var key = func(this[i]);
+
             if (!(key in result)) {
                 result[key] = [];
             }
 
             result[key].push(this[i]);
         }
+
         return result;
     }),
 
@@ -168,8 +172,10 @@ module.exports = {
     identity: function (value) {
         return value;
     },
+
     noop: function () {
     },
+
     hasFlatMap: function (val) {
         return (typeof val === "object" || typeof val === "function") && typeof val.flatMap === "function";
     },
@@ -179,8 +185,9 @@ module.exports = {
             return {
                 get: func,
                 enumerable: false
-            }
+            };
         }
+
         return {
             writable: true,
             value: func,
@@ -276,7 +283,7 @@ Object.defineProperty(Object, "zip", {
     }
 });
 
-var mapper = function (mapping, ignoreError) {
+function mapper (mapping, ignoreError) {
     return function (func) {
         var result = {};
 
@@ -292,31 +299,35 @@ var mapper = function (mapping, ignoreError) {
         }
 
         return result;
-    }
-};
+    };
+}
 
 Object.defineProperties(Object.prototype, {
     "isEmpty": functools.makeProperty('get', function () {
         return Object.keys(this).length === 0;
-    }),
+    }, true),
 
     "nonEmpty": functools.makeProperty('get', function () {
         return !this.isEmpty;
-    }),
+    }, true),
 
     "pairs": functools.makeProperty('get', function () {
         return this.keys.zip(this.values);
-    }),
+    }, true),
 
     "keys": functools.makeProperty('get', function () {
         return Object.keys(this);
-    }),
+    }, true),
 
     "values": functools.makeProperty('get', function () {
         var self = this;
         return Object.keys(this).map(function (key) {
             return self[key];
         });
+    }),
+
+    "contains": functools.makeProperty('value', function (value) {
+        return value in this;
     }),
 
     "map": functools.makeProperty('value', mapper(functools.identity)),
