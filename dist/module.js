@@ -167,14 +167,29 @@ Object.defineProperties(Array.prototype, {
         return this.concat(Array.from(arguments));
     })
 });
-},{"./common":2,"./maybe":3}],2:[function(require,module,exports){
+},{"./common":2,"./maybe":4}],2:[function(require,module,exports){
+function RequireFailedError (reason) {
+    this.constructor.call(this, reason);
+}
+
+RequireFailedError.prototype = Object.create(Error.prototype);
+
 module.exports = {
+    RequireFailedError: RequireFailedError,
+
+    assert: function (booleanExpression, failureMessage) {
+        if (!booleanExpression) {
+            throw new RequireFailedError(failureMessage);
+        }
+
+        return true;
+    },
+
     identity: function (value) {
         return value;
     },
 
-    noop: function () {
-    },
+    noop: function () {},
 
     hasFlatMap: function (val) {
         return (typeof val === "object" || typeof val === "function") && typeof val.flatMap === "function";
@@ -196,6 +211,130 @@ module.exports = {
     }
 };
 },{}],3:[function(require,module,exports){
+var Maybe = require('./maybe'),
+    functools = require('./common');
+require('./array');
+
+/* 
+ Credit for the type retrieval function and regex
+ goes to StackOverflow user Jason Bunting
+ http://stackoverflow.com/questions/332422/how-do-i-get-the-name-of-an-objects-type-in-javascript
+ */
+
+var funcNameRegex = /function (.{1,})\(/;
+function getType(obj) {
+    return (obj).constructor.toString().match(funcNameRegex).last.getOrElse("");
+}
+
+/*
+ Credit for the hashing function goes to StackOverflow
+ users Jesse Shieh and esmiralha
+ http://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
+ */
+
+function hashCode(key) {
+    var string = JSON.stringify(key) + getType(key);
+
+    var hash = 0, i, chr, len;
+    if (string.length === 0) {
+        return string;
+    }
+
+    for (i = 0, len = string.length; i < len; i++) {
+        chr = string.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0;
+    }
+    return hash.toString();
+}
+
+function Map() {
+    var pairs = Array.prototype.reduce.call(arguments, function (acc, pair) {
+        if (!Array.isArray(pair) && typeof pair === 'object') {
+            acc.push.call(acc, Object.unzip(pair));
+        } else {
+            functools.assert(Array.isArray(pair), "The input is neither an array or object");
+            functools.assert(pair.length, "The input pair array must have a length of 2");
+            acc.push(pair);
+        }
+
+        return acc;
+    }, []);
+
+    var hashCodeMap = {};
+
+    function randomize() {
+        var hash = Math.round(Math.random() * 1e12);
+        if (hash in hashCodeMap) {
+            return randomize();
+        }
+
+        return hash.toString();
+    }
+
+    for (var i = 0, length = pairs.length; i < length; i++) {
+        var key = pairs[i][0].valueOf(),
+            hash = null;
+
+        if (typeof key.__hashCode__ !== 'undefined') {
+            hash = key.__hashCode__;
+        } else if (typeof key === "object" || typeof key === 'function') {
+            hash = randomize();
+            Object.defineProperty(key, "__hashCode__", {
+                value: hash
+            });
+        } else {
+            hash = hashCode(key);
+        }
+
+        hashCodeMap[hash] = pairs[i][1];
+    }
+
+    return wrapApplyFunctionMap.call(null, pairs, function (key) {
+        key = key.valueOf();
+
+        var value;
+        if (typeof key === "object" || typeof key === 'function') {
+            value = hashCodeMap[key.__hashCode__];
+        } else {
+            value = hashCodeMap[hashCode(key)];
+        }
+
+        if (typeof value === 'undefined') {
+            throw new ReferenceError("No such key in map.");
+        }
+        return value;
+    });
+}
+
+function wrapApplyFunctionMap(pairs, func) {
+    Object.defineProperties(func, {
+        "add": {
+            value: function (pair) {
+                return Map.apply(null, pairs.append(pair));
+            }
+        },
+
+        "getMaybe": {
+            value: function (key) {
+                try {
+                    return Maybe(func(key));
+                } catch (error) {
+                    return Maybe.None();
+                }
+            }
+        },
+
+        "size": {
+            value: pairs.length
+        }
+    });
+    return func;
+}
+
+module.exports = Map;
+
+},{"./array":1,"./common":2,"./maybe":4}],4:[function(require,module,exports){
 var functools = require('./common');
 
 function Maybe(value) {
@@ -254,7 +393,7 @@ function None() {
 }
 
 module.exports = Maybe;
-},{"./common":2}],4:[function(require,module,exports){
+},{"./common":2}],5:[function(require,module,exports){
 var functools = require('./common');
 
 Object.defineProperties(Number.prototype, {
@@ -268,89 +407,35 @@ Object.defineProperties(Number.prototype, {
         return result;
     })
 });
-},{"./common":2}],5:[function(require,module,exports){
-var functools = require('./common');
+},{"./common":2}],6:[function(require,module,exports){
+Object.defineProperties(Object, {
+    "zip": {
+        value: function (arrayOfPairs) {
+            var result = {};
 
-Object.defineProperty(Object, "zip", {
-    value: function (arrayOfPairs) {
-        var result = {};
+            for (var i = 0, length = arrayOfPairs.length; i < length; i++) {
+                result[arrayOfPairs[i][0]] = arrayOfPairs[i][1];
+            }
 
-        for (var i = 0, length = arrayOfPairs.length; i < length; i++) {
-            result[arrayOfPairs[i][0]] = arrayOfPairs[i][1];
+            return result;
         }
+    },
 
-        return result;
-    }
-});
+    "unzip": {
+        value: function () {
+            var result = [];
 
-function mapper (mapping, ignoreError) {
-    return function (func) {
-        var result = {};
-
-        for (var key in this) {
-            if (this.hasOwnProperty(key)) {
-                var value = func(this[key], key, this);
-                if (Array.isArray(value) && value.length === 2) {
-                    result[value[0]] = mapping(value[1]);
-                } else if (!ignoreError) {
-                    throw "Invalid mapper error. Needed [key, value], got " + JSON.stringify(value) + ".";
+            for (var key in this) {
+                if (this.hasOwnProperty(key)) {
+                    result.push([this, this[key]]);
                 }
             }
+
+            return result;
         }
-
-        return result;
-    };
-}
-
-Object.defineProperties(Object.prototype, {
-    "isEmpty": functools.makeProperty('get', function () {
-        return Object.keys(this).length === 0;
-    }, true),
-
-    "nonEmpty": functools.makeProperty('get', function () {
-        return !this.isEmpty;
-    }, true),
-
-    "pairs": functools.makeProperty('get', function () {
-        return this.keys.zip(this.values);
-    }, true),
-
-    "keys": functools.makeProperty('get', function () {
-        return Object.keys(this);
-    }, true),
-
-    "values": functools.makeProperty('get', function () {
-        var self = this;
-        return Object.keys(this).map(function (key) {
-            return self[key];
-        });
-    }),
-
-    "contains": functools.makeProperty('value', function (value) {
-        return value in this;
-    }),
-
-    "map": functools.makeProperty('value', mapper(functools.identity)),
-
-    "foreach": functools.makeProperty('value', function () {
-        mapper(functools.identity, true).apply(this, arguments);
-    }),
-
-    "flatMap": functools.makeProperty('value', mapper(function (value) {
-        return functools.hasFlatMap(value) ? value.flatMap(functools.identity) : value;
-    })),
-
-    "filter": functools.makeProperty('value', function (func) {
-        var result = {};
-        for (var key in this) {
-            if (this.hasOwnProperty(key) && func(this[key], key, this)) {
-                result[key] = this[key];
-            }
-        }
-        return result;
-    })
+    }
 });
-},{"./common":2}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var functools = require('./common');
 
 Object.defineProperties(String.prototype, {
@@ -362,20 +447,22 @@ Object.defineProperties(String.prototype, {
         return this.indexOf(string) === 0;
     })
 });
-},{"./common":2}],7:[function(require,module,exports){
+},{"./common":2}],8:[function(require,module,exports){
 require('./app/array');
 require('./app/object');
 require('./app/string');
 require('./app/number');
+require('./app/hashmap');
 
 var functionalify = {
     common: require('./app/common'),
-    Maybe: require('./app/maybe')
+    Maybe: require('./app/maybe'),
+    Map: require('./app/hashmap')
 };
 
 if (typeof window !== 'undefined') {
-    window.functionalify = functionalify;
+    window.functionalify = window._ = functionalify;
 }
 
 module.exports = functionalify;
-},{"./app/array":1,"./app/common":2,"./app/maybe":3,"./app/number":4,"./app/object":5,"./app/string":6}]},{},[7,1,2,3,4,5,6]);
+},{"./app/array":1,"./app/common":2,"./app/hashmap":3,"./app/maybe":4,"./app/number":5,"./app/object":6,"./app/string":7}]},{},[8,1,2,3,4,5,6,7]);
