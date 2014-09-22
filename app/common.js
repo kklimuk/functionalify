@@ -15,6 +15,10 @@ module.exports = {
         return true;
     },
 
+    exists: function (value) {
+        return !(typeof value === 'undefined' || value === null);
+    },
+
     identity: function (value) {
         return value;
     },

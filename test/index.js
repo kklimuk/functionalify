@@ -1,40 +1,40 @@
 var expect = require('chai').expect,
     functionalify = require('..');
 
-describe('common', function () {
+describe('Utilities', function () {
     var common = functionalify.common;
-    describe('helpers', function () {
+    describe('identity', function () {
         it('should return itself on identity', function () {
             expect(common.identity("foobar")).to.equal("foobar");
         });
 
         it('should be a void function on identity', function () {
-            expect(common.noop("foobar")).to.equal(undefined);
+            expect(common.noop("foobar")).to.be.undefined;
         });
     });
 
     describe('hasFlatMap', function () {
         it('should return true on arrays', function () {
-            expect(common.hasFlatMap([])).to.equal(true);
+            expect(common.hasFlatMap([])).to.be.true;
         });
 
         it('should return true on maybes', function () {
-            expect(common.hasFlatMap(functionalify.Maybe(1))).to.equal(true);
+            expect(common.hasFlatMap(functionalify.Maybe(1))).to.be.true;
         });
 
         it('should return false on any function where flatmap is unavailable', function () {
-            expect(common.hasFlatMap({})).to.equal(false);
-            expect(common.hasFlatMap(function () {})).to.equal(false);
+            expect(common.hasFlatMap({})).to.be.false;
+            expect(common.hasFlatMap(function () {})).to.be.false;
         });
     });
 
     describe('makeProperty', function () {
         it('should have a get property if the type is get', function () {
-            expect(common.makeProperty('get', common.noop).hasOwnProperty('get')).to.equal(true);
+            expect(common.makeProperty('get', common.noop)).to.have.property('get', common.noop);
         });
 
         it('should have a value property if the type is value', function () {
-            expect(common.makeProperty('value', common.noop).hasOwnProperty('value')).to.equal(true);
+            expect(common.makeProperty('value', common.noop)).to.have.property('value', common.noop);
         });
     });
 
@@ -48,7 +48,7 @@ describe('common', function () {
         it('should not throw an error if the assertion is true', function () {
             expect(function () {
                 common.assert(true, "This is a failure");
-            }).to.not.throw(common.RequireFailedError).and.to.equal(true);
+            }).to.not.throw(common.RequireFailedError).and.to.be.true;
         });
     });
 });
