@@ -7,7 +7,7 @@ require('./array');
  */
 var funcNameRegex = /function (.{1,})\(/;
 function getType(obj) {
-    return (obj).constructor.toString().match(funcNameRegex).last.getOrElse("");
+    return (obj).constructor.toString().match(funcNameRegex).last;
 }
 
 /*
@@ -94,7 +94,6 @@ module.exports = {
             enumerable: false
         };
     },
-
 
     primitiveUniqueId: primitiveUniqueId,
     nativeHashing: nativeHashing

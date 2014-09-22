@@ -1,7 +1,7 @@
-var property = require('./utils').makeProperty;
+var utils = require('./utils');
 
 Object.defineProperties(Number.prototype, {
-    "times": property('value', function () {
+    "times": utils.makeProperty('get', function () {
         var result = [];
 
         for (var i = 0; i < this; i++) {
@@ -9,5 +9,9 @@ Object.defineProperties(Number.prototype, {
         }
 
         return result;
+    }),
+
+    "timestamp": utils.makeProperty('get', function () {
+        return new Date(this);
     })
 });

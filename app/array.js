@@ -1,6 +1,8 @@
 var functools = require('./common'),
-    utils = require('./utils'),
-    Maybe = require('./maybe');
+    hasFlatMap = utils = require('./utils').hasFlatMap,
+    assert = functools.assert,
+    makeProperty = require('./utils').makeProperty,
+    HashMap = require('./hashmap');
 
 Object.defineProperties(Array, {
     "isArray": { // credit: Douglas Crockford
@@ -11,9 +13,16 @@ Object.defineProperties(Array, {
         }
     },
 
+    // Array.from(array-like)
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
     "from": {
         value: function (value, mapper, thisArg) {
+            if (!functools.exists(value)) {
+                throw new TypeError('The value to convert must not be null or undefined.');
+            }
+
             var array = Array.prototype.slice.call(value);
+
             if (typeof mapper !== 'undefined') {
                 return array.map(mapper, thisArg);
             }
@@ -24,57 +33,64 @@ Object.defineProperties(Array, {
 });
 
 Object.defineProperties(Array.prototype, {
-    "isEmpty": utils.makeProperty('get', function () {
+    "isEmpty": makeProperty('get', function () {
         return this.length === 0;
     }),
 
-    "nonEmpty": utils.makeProperty('get', function () {
-        return !this.isEmpty;
+    "nonEmpty": makeProperty('get', function () {
+        return this.length > 0;
     }),
 
-    "flatMap": utils.makeProperty('value', function (func) {
-        return this.map(func).flatten();
-    }),
-
-    "flatten": utils.makeProperty('value', function () {
+    "flatMap": makeProperty('value', function (func) {
         var result = [];
 
+        console.log(hasFlatMap, "taco");
+
         for (var i = 0, length = this.length; i < length; i++) {
-            if (functools.hasFlatMap(this[i])) {
-                result.push.apply(result, this[i].flatMap(functools.identity));
+            if (hasFlatMap(this[i])) {
+                var flatMapped = this[i].flatMap(func);
+                if (flatMapped.length) {
+                    result.push.apply(result, flatMapped);
+                } else {
+                    result.push(flatMapped);
+                }
             } else {
-                result.push(this[i]);
+                result.push(func(this[i]));
             }
         }
 
         return result;
     }),
 
-    "head": utils.makeProperty('get', function () {
-        return Maybe(this[0]);
+    "flatten": makeProperty('value', function () {
+        return this.flatMap(functools.identity);
     }),
 
-    "last": utils.makeProperty('get', function () {
-        return this.length === 0 ? Maybe.None() : Maybe(this[this.length - 1]);
+    "head": makeProperty('get', function () {
+        return this[0];
     }),
 
-    "init": utils.makeProperty('get', function () {
-        return this.length === 0 ? [] : this.slice(0, this.length - 1);
-    }),
-
-    "tail": utils.makeProperty('get', function () {
+    "tail": makeProperty('get', function () {
         return this.length === 0 ? [] : this.slice(1);
     }),
 
-    "take": utils.makeProperty('value', function (num) {
+    "last": makeProperty('get', function () {
+        return this[this.length - 1];
+    }),
+
+    "init": makeProperty('get', function () {
+        return this.length === 0 ? [] : this.slice(0, this.length - 1);
+    }),
+
+    "take": makeProperty('value', function (num) {
         return this.slice(0, num);
     }),
 
-    "drop": utils.makeProperty('value', function (num) {
+    "drop": makeProperty('value', function (num) {
         return this.slice(num);
     }),
 
-    "partition": utils.makeProperty('value', function (func) {
+    "partition": makeProperty('value', function (func) {
         var a = [], b = [];
         for (var i = 0, length = this.length; i < length; i++) {
             var pushTo = func(this[i]) ? a : b;
@@ -83,7 +99,7 @@ Object.defineProperties(Array.prototype, {
         return [a, b];
     }),
 
-    "takeWhile": utils.makeProperty('value', function (func) {
+    "takeWhile": makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (!func(this[i])) {
                 return this.slice(0, i);
@@ -92,7 +108,7 @@ Object.defineProperties(Array.prototype, {
         return this.slice(0);
     }),
 
-    "dropWhile": utils.makeProperty('value', function (func) {
+    "dropWhile": makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (!func(this[i])) {
                 return this.slice(i);
@@ -101,16 +117,17 @@ Object.defineProperties(Array.prototype, {
         return [];
     }),
 
-    "every": utils.makeProperty('value', function (func) {
+    "every": makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (!func(this[i])) {
                 return false;
             }
         }
+
         return true;
     }),
 
-    "any": utils.makeProperty('value', function (func) {
+    "some": makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (func(this[i])) {
                 return true;
@@ -120,21 +137,24 @@ Object.defineProperties(Array.prototype, {
         return false;
     }),
 
-    "find": utils.makeProperty('value', function (func) {
+    "find": makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (func(this[i])) {
-                return Maybe(this[i]);
+                return this[i];
             }
         }
-
-        return Maybe.None();
+        return undefined;
     }),
 
-    "contains": utils.makeProperty('value', function (func) {
-        return this.find(func) !== Maybe.None();
+    "contains": makeProperty('value', function (func) {
+        return !!this.find(func);
     }),
 
-    "zip": utils.makeProperty('value', function (other) {
+    "zip": makeProperty('value', function (other) {
+        if (!Array.isArray(other)) {
+            throw new TypeError('Zip requires an array.');
+        }
+
         var arrayToZip = other.length < this.length ? other : this,
             otherArray = this === arrayToZip ? other : this;
 
@@ -143,10 +163,11 @@ Object.defineProperties(Array.prototype, {
         });
     }),
 
-    "groupBy": utils.makeProperty('value', function (func) {
-        var result = {};
+    "groupBy": makeProperty('value', function (func) {
+        var result = HashMap();
 
         for (var i = 0, length = this.length; i < length; i++) {
+            result.add();
             var key = func(this[i]);
 
             if (!(key in result)) {
@@ -159,11 +180,11 @@ Object.defineProperties(Array.prototype, {
         return result;
     }),
 
-    "prepend": utils.makeProperty('value', function () {
+    "prepend": makeProperty('value', function () {
         return Array.from(arguments).concat(this);
     }),
 
-    "append": utils.makeProperty('value', function () {
+    "append": makeProperty('value', function () {
         return this.concat(Array.from(arguments));
     })
 });
