@@ -1,5 +1,6 @@
-var functools = require('./common');
-var Maybe = require('./maybe');
+var functools = require('./common'),
+    utils = require('./utils'),
+    Maybe = require('./maybe');
 
 Object.defineProperties(Array, {
     "isArray": { // credit: Douglas Crockford
@@ -23,19 +24,19 @@ Object.defineProperties(Array, {
 });
 
 Object.defineProperties(Array.prototype, {
-    "isEmpty": functools.makeProperty('get', function () {
+    "isEmpty": utils.makeProperty('get', function () {
         return this.length === 0;
     }),
 
-    "nonEmpty": functools.makeProperty('get', function () {
+    "nonEmpty": utils.makeProperty('get', function () {
         return !this.isEmpty;
     }),
 
-    "flatMap": functools.makeProperty('value', function (func) {
+    "flatMap": utils.makeProperty('value', function (func) {
         return this.map(func).flatten();
     }),
 
-    "flatten": functools.makeProperty('value', function () {
+    "flatten": utils.makeProperty('value', function () {
         var result = [];
 
         for (var i = 0, length = this.length; i < length; i++) {
@@ -49,31 +50,31 @@ Object.defineProperties(Array.prototype, {
         return result;
     }),
 
-    "head": functools.makeProperty('get', function () {
+    "head": utils.makeProperty('get', function () {
         return Maybe(this[0]);
     }),
 
-    "last": functools.makeProperty('get', function () {
+    "last": utils.makeProperty('get', function () {
         return this.length === 0 ? Maybe.None() : Maybe(this[this.length - 1]);
     }),
 
-    "init": functools.makeProperty('get', function () {
+    "init": utils.makeProperty('get', function () {
         return this.length === 0 ? [] : this.slice(0, this.length - 1);
     }),
 
-    "tail": functools.makeProperty('get', function () {
+    "tail": utils.makeProperty('get', function () {
         return this.length === 0 ? [] : this.slice(1);
     }),
 
-    "take": functools.makeProperty('value', function (num) {
+    "take": utils.makeProperty('value', function (num) {
         return this.slice(0, num);
     }),
 
-    "drop": functools.makeProperty('value', function (num) {
+    "drop": utils.makeProperty('value', function (num) {
         return this.slice(num);
     }),
 
-    "partition": functools.makeProperty('value', function (func) {
+    "partition": utils.makeProperty('value', function (func) {
         var a = [], b = [];
         for (var i = 0, length = this.length; i < length; i++) {
             var pushTo = func(this[i]) ? a : b;
@@ -82,7 +83,7 @@ Object.defineProperties(Array.prototype, {
         return [a, b];
     }),
 
-    "takeWhile": functools.makeProperty('value', function (func) {
+    "takeWhile": utils.makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (!func(this[i])) {
                 return this.slice(0, i);
@@ -91,7 +92,7 @@ Object.defineProperties(Array.prototype, {
         return this.slice(0);
     }),
 
-    "dropWhile": functools.makeProperty('value', function (func) {
+    "dropWhile": utils.makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (!func(this[i])) {
                 return this.slice(i);
@@ -100,7 +101,7 @@ Object.defineProperties(Array.prototype, {
         return [];
     }),
 
-    "every": functools.makeProperty('value', function (func) {
+    "every": utils.makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (!func(this[i])) {
                 return false;
@@ -109,7 +110,7 @@ Object.defineProperties(Array.prototype, {
         return true;
     }),
 
-    "any": functools.makeProperty('value', function (func) {
+    "any": utils.makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (func(this[i])) {
                 return true;
@@ -119,7 +120,7 @@ Object.defineProperties(Array.prototype, {
         return false;
     }),
 
-    "find": functools.makeProperty('value', function (func) {
+    "find": utils.makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (func(this[i])) {
                 return Maybe(this[i]);
@@ -129,11 +130,11 @@ Object.defineProperties(Array.prototype, {
         return Maybe.None();
     }),
 
-    "contains": functools.makeProperty('value', function (func) {
+    "contains": utils.makeProperty('value', function (func) {
         return this.find(func) !== Maybe.None();
     }),
 
-    "zip": functools.makeProperty('value', function (other) {
+    "zip": utils.makeProperty('value', function (other) {
         var arrayToZip = other.length < this.length ? other : this,
             otherArray = this === arrayToZip ? other : this;
 
@@ -142,7 +143,7 @@ Object.defineProperties(Array.prototype, {
         });
     }),
 
-    "groupBy": functools.makeProperty('value', function (func) {
+    "groupBy": utils.makeProperty('value', function (func) {
         var result = {};
 
         for (var i = 0, length = this.length; i < length; i++) {
@@ -158,11 +159,11 @@ Object.defineProperties(Array.prototype, {
         return result;
     }),
 
-    "prepend": functools.makeProperty('value', function () {
+    "prepend": utils.makeProperty('value', function () {
         return Array.from(arguments).concat(this);
     }),
 
-    "append": functools.makeProperty('value', function () {
+    "append": utils.makeProperty('value', function () {
         return this.concat(Array.from(arguments));
     })
 });

@@ -1,7 +1,7 @@
-var functools = require('./common');
+var property = require('./utils').makeProperty;
 
 Object.defineProperties(Number.prototype, {
-    "times": functools.makeProperty('value', function () {
+    "times": property('value', function () {
         var result = [];
 
         for (var i = 0; i < this; i++) {

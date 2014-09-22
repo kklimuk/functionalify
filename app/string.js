@@ -1,11 +1,11 @@
-var functools = require('./common');
+var property = require('./utils').makeProperty;
 
 Object.defineProperties(String.prototype, {
-    "contains": functools.makeProperty('value', function (string) {
+    "contains": property('value', function (string) {
         return !!~this.indexOf(string);
     }),
 
-    "startswith": functools.makeProperty('value', function (string) {
+    "startswith": property('value', function (string) {
         return this.indexOf(string) === 0;
     })
 });
