@@ -7,27 +7,20 @@ var Map = require('..').Map,
 should();
 
 describe('Map', function () {
-    var mutableObject = {},
-        map = Map([418, "hello"], ["world", "I'm a teapot"], [mutableObject, 1234]);
+    var map = Map({
+        "foo": "bar",
+        "123": 321
+    }, ["taco", "belle"]);
 
-    it('should be able retrieve primitive keys', function () {
-        map(418).should.equal("hello");
-        map("world").should.equal("I'm a teapot");
+    it('should be able to create a map from an object', function () {
+        map("foo").should.equal("bar");
+        map("123").should.equal(321);
+        map("taco").should.equal("belle");
     });
 
-    it('should not retrieve a value for an object with the same properties ' +
-        'but a different reference as a key', function () {
+    it('should throw a reference error when called on a nonexisting key', function () {
         expect(function () {
-            map({});
+            map("freedom!");
         }).to.throw(ReferenceError);
     });
-
-//    it('should ')
-
-    it('should be able to retrieve mutable objects', function () {
-        map(mutableObject).should.equal(1234);
-        mutableObject.foo = "bar";
-        map(mutableObject).should.equal(1234);
-    });
-
 });

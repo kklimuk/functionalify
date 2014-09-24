@@ -32,6 +32,49 @@ function primitiveUniqueId(key) {
     return hash.toString();
 }
 
+function nativeHashing(pairs) {
+    var hashCodeMap = {};
+
+    function randomize() {
+        var hash = Math.round(Math.random() * 1e12);
+        if (hash in hashCodeMap) {
+            return randomize();
+        }
+
+        return hash.toString();
+    }
+
+    for (var i = 0, length = pairs.length; i < length; i++) {
+        var key = pairs[i][0].valueOf(),
+            hash = null;
+
+        if (typeof key.__hashCode__ !== 'undefined') {
+            hash = key.__hashCode__;
+        } else if (typeof key === "object" || typeof key === 'function') {
+            hash = randomize();
+            Object.defineProperty(key, "__hashCode__", {
+                value: hash
+            });
+        } else {
+            hash = primitiveUniqueId(key);
+        }
+
+        hashCodeMap[hash] = pairs[i][1];
+    }
+
+    return hashCodeMap;
+}
+
+nativeHashing.getKeyFrom = function (key, from) {
+    key = key.valueOf();
+
+    if (typeof key === "object" || typeof key === 'function') {
+        return from[key.__hashCode__];
+    }
+
+    return from[primitiveUniqueId(key)];
+};
+
 module.exports = {
     hasFlatMap: function (val) {
         return (typeof val === "object" || typeof val === "function") && typeof val.flatMap === "function";
@@ -54,37 +97,5 @@ module.exports = {
 
 
     primitiveUniqueId: primitiveUniqueId,
-
-    nativeHashing: function (pairs) {
-        var hashCodeMap = {};
-
-        function randomize() {
-            var hash = Math.round(Math.random() * 1e12);
-            if (hash in hashCodeMap) {
-                return randomize();
-            }
-
-            return hash.toString();
-        }
-
-        for (var i = 0, length = pairs.length; i < length; i++) {
-            var key = pairs[i][0].valueOf(),
-                hash = null;
-
-            if (typeof key.__hashCode__ !== 'undefined') {
-                hash = key.__hashCode__;
-            } else if (typeof key === "object" || typeof key === 'function') {
-                hash = randomize();
-                Object.defineProperty(key, "__hashCode__", {
-                    value: hash
-                });
-            } else {
-                hash = primitiveUniqueId(key);
-            }
-
-            hashCodeMap[hash] = pairs[i][1];
-        }
-
-        return hashCodeMap;
-    }
+    nativeHashing: nativeHashing
 };

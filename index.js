@@ -7,11 +7,15 @@ require('./app/hashmap');
 var functionalify = {
     common: require('./app/common'),
     Maybe: require('./app/maybe'),
-    Map: require('./app/hashmap')
+    Map: require('./app/hashmap'),
+    Set: require('./app/hashset')
 };
 
 if (typeof window !== 'undefined') {
-    window.functionalify = window._ = functionalify;
+    window.functionalify = window._ = require('./app/common');
+    window.Map = functionalify.Map;
+    window.Set = functionalify.Set;
+    window.Maybe = functionalify.Maybe;
 }
 
 module.exports = functionalify;

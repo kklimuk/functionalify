@@ -12,12 +12,12 @@ Object.defineProperties(Object, {
     },
 
     "unzip": {
-        value: function () {
+        value: function (object) {
             var result = [];
 
-            for (var key in this) {
-                if (this.hasOwnProperty(key)) {
-                    result.push([this, this[key]]);
+            for (var key in object) {
+                if (object.hasOwnProperty(key)) {
+                    result.push([key, object[key]]);
                 }
             }
 
