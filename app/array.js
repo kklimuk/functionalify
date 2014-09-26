@@ -41,29 +41,40 @@ Object.defineProperties(Array.prototype, {
     }),
 
     "flatMap": makeProperty('value', function (func) {
-        return this.map(func).flatten();
-    }),
-
-    "flatten": makeProperty('value', function () {
         var result = [];
 
         for (var i = 0, length = this.length; i < length; i++) {
             if (functools.hasFlatMap(this[i])) {
-                result.push.apply(result, this[i].flatMap(functools.identity));
+                var flatMapped = this[i].flatMap(func);
+                if (flatMapped.length) {
+                    result.push.apply(result, flatMapped);
+                } else {
+                    result.push(flatMapped);
+                }
             } else {
-                result.push(this[i]);
+                result.push(func(this[i]));
             }
         }
 
         return result;
     }),
 
+    "flatten": makeProperty('value', function () {
+        return this.flatMap(functools.identity);
+    }),
+
     "head": makeProperty('get', function () {
-        return Maybe(this[0]);
+        if (this.length === 0) {
+            throw new ReferenceError('Array does not have a head.');
+        }
+        return this[0];
     }),
 
     "last": makeProperty('get', function () {
-        return this.length === 0 ? Maybe.None() : Maybe(this[this.length - 1]);
+        if (this.length === 0) {
+            throw new ReferenceError('Array does not have a tail.');
+        }
+        return this[this.length - 1];
     }),
 
     "init": makeProperty('get', function () {
