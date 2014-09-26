@@ -70,6 +70,10 @@ Object.defineProperties(Array.prototype, {
         return this[0];
     }),
 
+    "tail": makeProperty('get', function () {
+        return this.length === 0 ? [] : this.slice(1);
+    }),
+
     "last": makeProperty('get', function () {
         if (this.length === 0) {
             throw new ReferenceError('Array does not have a tail.');
@@ -79,10 +83,6 @@ Object.defineProperties(Array.prototype, {
 
     "init": makeProperty('get', function () {
         return this.length === 0 ? [] : this.slice(0, this.length - 1);
-    }),
-
-    "tail": makeProperty('get', function () {
-        return this.length === 0 ? [] : this.slice(1);
     }),
 
     "take": makeProperty('value', function (num) {

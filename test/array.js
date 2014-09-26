@@ -126,5 +126,67 @@ describe('Array', function () {
                 }).to.throw(ReferenceError);
             });
         });
+
+        describe('tail', function () {
+           it('should return the members of the array besides the head if nonempty', function () {
+               nonempty.tail.should.not.include(1);
+               nonempty.tail.should.include.members([2, 3, 4]);
+               nonempty.tail.should.have.length(3);
+           });
+
+           it('should return an empty array if the array is empty', function () {
+               empty.tail.should.be.empty;
+           });
+        });
+
+        describe('init', function () {
+            it('should return the members of the array besides the last if nonempty', function () {
+               nonempty.init.should.not.include(4);
+               nonempty.init.should.include.members([1, 2, 3]);
+               nonempty.init.should.have.length(3);
+           });
+
+           it('should return an empty array if the array is empty', function () {
+               empty.init.should.be.empty;
+           });
+        });
+
+        describe('take', function () {
+            it('should return at most the size of the array', function () {
+                nonempty.take(2).should.have.length(2);
+                nonempty.take(0).should.have.length(0);
+                nonempty.take(nonempty.length).should.have.length(nonempty.length);
+                nonempty.take(nonempty.length + 5).should.have.length(nonempty.length);
+            });
+
+            it('should return the right taken values', function () {
+                nonempty.take(2).should.include.members([1, 2]);
+                nonempty.take(2).should.have.length(2);
+            });
+
+            it('should always return empty arrays on taking from one', function () {
+                empty.take(0).should.have.length(0);
+                empty.take(2).should.have.length(0);
+            });
+        });
+
+        describe('drop', function () {
+            it('should return the right size after dropping', function () {
+                nonempty.drop(0).should.have.length(nonempty.length);
+                nonempty.drop(2).should.have.length(nonempty.length - 2);
+                nonempty.drop(nonempty.length).should.have.length(0);
+                nonempty.drop(nonempty.length + 5).should.have.length(0);
+            });
+
+            it('should return the right dropped values', function () {
+                nonempty.drop(2).should.include.members([3, 4]);
+                nonempty.drop(2).should.have.length(nonempty.length - 2);
+            });
+
+            it('should always return empty arrays on dropping from one', function () {
+                empty.drop(0).should.have.length(0);
+                empty.drop(2).should.have.length(0);
+            });
+        });
     });
 });
