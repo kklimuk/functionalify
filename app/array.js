@@ -143,6 +143,7 @@ Object.defineProperties(Array.prototype, {
                 return this[i];
             }
         }
+
         return undefined;
     }),
 
