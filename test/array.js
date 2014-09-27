@@ -189,4 +189,76 @@ describe('Array', function () {
             });
         });
     });
+
+    describe('Iteration tools', function () {
+        var nonempty = (20).times,
+            empty = [];
+
+        describe('partition', function () {
+            it('should divide the number array into odds and evens', function () {
+                var result = nonempty.partition(function (iteration) {
+                    return iteration % 2;
+                });
+
+                result.head.should.have.length(10);
+                result.head.should.satisfy(function (values) {
+                    return values.reduce(function (acc, current) {
+                        return !(!acc || !(current % 2));
+                    }, true);
+                });
+
+                result.last.should.have.length(10);
+                result.last.should.satisfy(function (values) {
+                    return values.reduce(function (acc, current) {
+                        return !(!acc || current % 2);
+                    }, true);
+                });
+            });
+
+            it('should create empty partition for the empty array', function () {
+                var result = empty.partition(function (iteration) {
+                    return iteration % 2;
+                });
+
+                result.head.should.be.empty;
+                result.last.should.be.empty;
+            });
+        });
+
+        describe('takeWhile', function () {
+            it('should stop taking after the condition is met', function () {
+                var result = nonempty.takeWhile(function (iteration) {
+                    return iteration < 10;
+                });
+
+                result.should.have.length(10);
+                result.should.not.include.members([10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
+                result.should.include.members((10).times);
+            });
+
+            it('should return nothing for an empty array', function () {
+                empty.takeWhile(function () {
+                    return true;
+                }).should.be.empty;
+            });
+        });
+
+        describe('dropWhile', function () {
+            it('should stop dropping after the condition is met', function () {
+                var result = nonempty.dropWhile(function (iteration) {
+                    return iteration < 10;
+                });
+
+                result.should.have.length(10);
+                result.should.not.include.members((10).times);
+                result.should.include.members([10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
+            });
+
+            it('should return nothing for an empty array', function () {
+                empty.dropWhile(function () {
+                    return true;
+                }).should.be.empty;
+            });
+        });
+    });
 });
