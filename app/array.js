@@ -126,10 +126,11 @@ Object.defineProperties(Array.prototype, {
                 return false;
             }
         }
+
         return true;
     }),
 
-    "any": makeProperty('value', function (func) {
+    "some": makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (func(this[i])) {
                 return true;
@@ -142,15 +143,19 @@ Object.defineProperties(Array.prototype, {
     "find": makeProperty('value', function (func) {
         for (var i = 0, length = this.length; i < length; i++) {
             if (func(this[i])) {
-                return Maybe(this[i]);
+                return this[i];
             }
         }
 
-        return Maybe.None();
+        throw new ReferenceError('Value not found.');
     }),
 
     "contains": makeProperty('value', function (func) {
-        return this.find(func) !== Maybe.None();
+        try {
+            return !!this.find(func);
+        } catch (error) {
+            return false;
+        }
     }),
 
     "zip": makeProperty('value', function (other) {

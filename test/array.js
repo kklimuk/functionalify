@@ -261,4 +261,66 @@ describe('Array', function () {
             });
         });
     });
+
+    describe('Element presence', function () {
+        var nonempty = (10).times;
+
+        describe('every', function () {
+            it('should return false if every element does not meet the requirement', function () {
+                nonempty.every(function (iteration) {
+                    return iteration < 5;
+                }).should.be.false;
+            });
+
+            it('should return true if every element meets the requirement', function () {
+                nonempty.every(function (iteration) {
+                    return iteration < 10;
+                }).should.be.true;
+            });
+        });
+
+        describe('some', function () {
+            it('should return false if no element meets the requirement', function () {
+                nonempty.some(function (iteration) {
+                    return iteration > 10;
+                }).should.be.false;
+            });
+
+            it('should return true if some element meets the requirement', function () {
+                nonempty.some(function (iteration) {
+                    return iteration > 8;
+                }).should.be.true;
+            });
+        });
+
+        describe('find', function () {
+            it('should return the value if the element is in the array', function () {
+                nonempty.find(function (value) {
+                    return value === 5;
+                }).should.equal(5);
+            });
+
+            it('should throw a ReferenceError if it is not', function () {
+                expect(function () {
+                    nonempty.find(function () {
+                        return false;
+                    });
+                }).to.throw(ReferenceError);
+            });
+        });
+
+        describe('contains', function () {
+            it('should return true if the element is in the array', function () {
+                nonempty.contains(function (value) {
+                    return value === 5;
+                }).should.be.true;
+            });
+
+            it('should return false if the element is not in the array', function () {
+                nonempty.contains(function (value) {
+                    return false;
+                }).should.be.false;
+            });
+        });
+    });
 });

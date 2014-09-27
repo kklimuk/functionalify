@@ -9,5 +9,9 @@ Object.defineProperties(Number.prototype, {
         }
 
         return result;
+    }),
+
+    "timestamp": functools.makeProperty('get', function () {
+        return new Date(this);
     })
 });
