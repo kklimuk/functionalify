@@ -44,8 +44,6 @@ Object.defineProperties(Array.prototype, {
     "flatMap": makeProperty('value', function (func) {
         var result = [];
 
-        console.log(hasFlatMap, "taco");
-
         for (var i = 0, length = this.length; i < length; i++) {
             if (hasFlatMap(this[i])) {
                 var flatMapped = this[i].flatMap(func);
