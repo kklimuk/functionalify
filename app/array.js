@@ -64,9 +64,6 @@ Object.defineProperties(Array.prototype, {
     }),
 
     "head": makeProperty('get', function () {
-        if (this.length === 0) {
-            throw new ReferenceError('Array does not have a head.');
-        }
         return this[0];
     }),
 
@@ -75,9 +72,6 @@ Object.defineProperties(Array.prototype, {
     }),
 
     "last": makeProperty('get', function () {
-        if (this.length === 0) {
-            throw new ReferenceError('Array does not have a tail.');
-        }
         return this[this.length - 1];
     }),
 
@@ -146,16 +140,11 @@ Object.defineProperties(Array.prototype, {
                 return this[i];
             }
         }
-
-        throw new ReferenceError('Value not found.');
+        return undefined;
     }),
 
     "contains": makeProperty('value', function (func) {
-        try {
-            return !!this.find(func);
-        } catch (error) {
-            return false;
-        }
+        return !!this.find(func);
     }),
 
     "zip": makeProperty('value', function (other) {

@@ -108,10 +108,8 @@ describe('Array', function () {
                 nonempty.head.should.equal(1);
             });
 
-            it('should throw a ReferenceError if the array is empty', function () {
-                expect(function () {
-                    empty.head;
-                }).to.throw(ReferenceError);
+            it('should return undefined in an array without a head', function () {
+                expect(empty.head).to.be.undefined;
             });
         });
 
@@ -120,35 +118,33 @@ describe('Array', function () {
                 nonempty.last.should.equal(4);
             });
 
-            it('should throw a ReferenceError if the array is empty', function () {
-                expect(function () {
-                    empty.last;
-                }).to.throw(ReferenceError);
+            it('should return undefined in an array without a last', function () {
+                expect(empty.last).to.be.undefined;
             });
         });
 
         describe('tail', function () {
-           it('should return the members of the array besides the head if nonempty', function () {
-               nonempty.tail.should.not.include(1);
-               nonempty.tail.should.include.members([2, 3, 4]);
-               nonempty.tail.should.have.length(3);
-           });
+            it('should return the members of the array besides the head if nonempty', function () {
+                nonempty.tail.should.not.include(1);
+                nonempty.tail.should.include.members([2, 3, 4]);
+                nonempty.tail.should.have.length(3);
+            });
 
-           it('should return an empty array if the array is empty', function () {
-               empty.tail.should.be.empty;
-           });
+            it('should return an empty array if the array is empty', function () {
+                empty.tail.should.be.empty;
+            });
         });
 
         describe('init', function () {
             it('should return the members of the array besides the last if nonempty', function () {
-               nonempty.init.should.not.include(4);
-               nonempty.init.should.include.members([1, 2, 3]);
-               nonempty.init.should.have.length(3);
-           });
+                nonempty.init.should.not.include(4);
+                nonempty.init.should.include.members([1, 2, 3]);
+                nonempty.init.should.have.length(3);
+            });
 
-           it('should return an empty array if the array is empty', function () {
-               empty.init.should.be.empty;
-           });
+            it('should return an empty array if the array is empty', function () {
+                empty.init.should.be.empty;
+            });
         });
 
         describe('take', function () {
@@ -300,12 +296,10 @@ describe('Array', function () {
                 }).should.equal(5);
             });
 
-            it('should throw a ReferenceError if it is not', function () {
-                expect(function () {
-                    nonempty.find(function () {
-                        return false;
-                    });
-                }).to.throw(ReferenceError);
+            it('should return undefined if element not found', function () {
+                expect(nonempty.find(function () {
+                    return false;
+                })).to.be.undefined;
             });
         });
 
@@ -317,7 +311,7 @@ describe('Array', function () {
             });
 
             it('should return false if the element is not in the array', function () {
-                nonempty.contains(function (value) {
+                nonempty.contains(function () {
                     return false;
                 }).should.be.false;
             });
