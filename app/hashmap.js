@@ -19,11 +19,7 @@ function Map() {
 
     var hashCodeMap = nativeHashing(pairs);
     return wrapApplyFunctionMap.call(null, pairs, function (key) {
-        var value = nativeHashing.getKeyFrom(key, hashCodeMap);
-        if (typeof value === 'undefined') {
-            throw new ReferenceError("No such key in map.");
-        }
-        return value;
+        return nativeHashing.getKeyFrom(key, hashCodeMap);
     });
 }
 
@@ -31,7 +27,7 @@ function wrapApplyFunctionMap(pairs, func) {
     Object.defineProperties(func, {
         "add": {
             value: function (pair) {
-                return Map.apply(null, pairs.append(pair));
+                return Map.apply(null, pairs.immutableAppend(pair));
             }
         },
 

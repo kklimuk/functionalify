@@ -163,27 +163,36 @@ Object.defineProperties(Array.prototype, {
     }),
 
     "groupBy": makeProperty('value', function (func) {
-        var result = HashMap();
+        var map = HashMap();
 
         for (var i = 0, length = this.length; i < length; i++) {
-            result.add();
             var key = func(this[i]);
 
-            if (!(key in result)) {
-                result[key] = [];
+            if (!functools.exists(map(key))) {
+                map = map.add([key, []]);
             }
 
-            result[key].push(this[i]);
+            map(key).push(this[i]);
         }
 
-        return result;
+        return map;
     }),
 
     "prepend": makeProperty('value', function () {
-        return Array.from(arguments).concat(this);
+        this.unshift.apply(this, arguments);
+        return this;
     }),
 
     "append": makeProperty('value', function () {
+        this.push.apply(this, arguments);
+        return this;
+    }),
+
+    "immutableAppend": makeProperty('value', function () {
         return this.concat(Array.from(arguments));
+    }),
+
+    "immutablePrepend": makeProperty('value', function () {
+        return Array.from(arguments).concat(this);
     })
 });

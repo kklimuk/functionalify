@@ -349,5 +349,75 @@ describe('Array', function () {
                 }).to.throw(TypeError);
             });
         });
+
+        describe('groupBy', function () {
+            it('should create a hashmap of arrays', function () {
+                var result = (10).times.groupBy(function (iteration) {
+                    return iteration % 2;
+                });
+
+                result(0).should.have.length(5);
+                result(0).should.have.members([0, 2, 4, 6, 8]);
+                result(1).should.have.length(5);
+                result(1).should.have.members([1, 3, 5, 7, 9]);
+            });
+
+            it('should crate an empty hashmap if the initial array is empty', function () {
+                [].groupBy(function (iter) {
+                    return iter % 2;
+                }).size.should.equal(0);
+            });
+        });
+    });
+
+    describe('Appending and prepending', function () {
+        describe('append', function () {
+            it('should add the item as to the last position', function () {
+                (5).times.append(5).last.should.equal(5);
+            });
+
+            it('should maintain the reference to the original array', function () {
+                var array = (5).times,
+                    modifiedArray = array.append(5);
+                array.should.equal(modifiedArray);
+            });
+        });
+
+        describe('prepend', function () {
+            it('should add the item as to the first position', function () {
+                (5).times.prepend(5).head.should.equal(5);
+            });
+
+            it('should maintain the reference to the original array', function () {
+                var array = (5).times,
+                    modifiedArray = array.prepend(5);
+                array.should.equal(modifiedArray);
+            });
+        });
+
+        describe('immutableAppend', function () {
+            it('should add the item as to the last position', function () {
+                (5).times.immutableAppend(5).last.should.equal(5);
+            });
+
+            it('should not maintain the reference to the original array', function () {
+                var array = (5).times,
+                    modifiedArray = array.immutableAppend(5);
+                array.should.not.equal(modifiedArray);
+            });
+        });
+
+        describe('immutablePrepend', function () {
+            it('should add the item as to the first position', function () {
+                var array = (5).times;
+                array.immutablePrepend(5).head.should.equal(5);
+            });
+
+            it('should not maintain the reference to the original array', function () {
+                var array = (5).times,
+                    modifiedArray = array.immutablePrepend(5);
+                array.should.not.equal(modifiedArray);
+            });
+        });
     });
 });
