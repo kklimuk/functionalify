@@ -27,7 +27,7 @@ functionalify fills in these holes by:
 Below are some motivating examples:
 
 ### Finding the value of a query string param
-``` js
+```js
 function getParamValue(search, param) {
     return search.slice(1).split("&")
         .find(function(component) { return component.startswith(param + "=") })

@@ -1,4 +1,4 @@
-var functools = require('./common');
+var utils = require('./utils');
 
 function Maybe(value) {
     return Some(value);
@@ -13,7 +13,7 @@ function Some(value) {
 
     var flatmap = function (func) {
         var val = func(value);
-        return functools.hasFlatMap(val) ? val.flatMap(functools.identity) : Maybe(val);
+        return utils.hasFlatMap(val) ? val.flatMap(functools.identity) : Maybe(val);
     };
 
     return Object.create(Some.prototype, {
