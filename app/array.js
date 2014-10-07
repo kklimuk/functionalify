@@ -1,7 +1,8 @@
 var functools = require('./common'),
-    hasFlatMap = utils = require('./utils').hasFlatMap,
     assert = functools.assert,
     makeProperty = require('./utils').makeProperty,
+    hasFlatMap = require('./utils').hasFlatMap,
+    commonFlatMap = require('./utils').commonFlatMap,
     HashMap = require('./hashmap');
 
 Object.defineProperties(Array, {
@@ -42,22 +43,7 @@ Object.defineProperties(Array.prototype, {
     }),
 
     "flatMap": makeProperty('value', function (func) {
-        var result = [];
-
-        for (var i = 0, length = this.length; i < length; i++) {
-            if (hasFlatMap(this[i])) {
-                var flatMapped = this[i].flatMap(func);
-                if (flatMapped.length) {
-                    result.push.apply(result, flatMapped);
-                } else {
-                    result.push(flatMapped);
-                }
-            } else {
-                result.push(func(this[i]));
-            }
-        }
-
-        return result;
+        return commonFlatMap(this, func);
     }),
 
     "flatten": makeProperty('value', function () {

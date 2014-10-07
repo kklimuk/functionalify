@@ -13,31 +13,6 @@ describe('Utilities', function () {
         });
     });
 
-    describe('hasFlatMap', function () {
-        it('should return true on arrays', function () {
-            expect(common.hasFlatMap([])).to.be.true;
-        });
-
-        it('should return true on maybes', function () {
-            expect(common.hasFlatMap(functionalify.Maybe(1))).to.be.true;
-        });
-
-        it('should return false on any function where flatmap is unavailable', function () {
-            expect(common.hasFlatMap({})).to.be.false;
-            expect(common.hasFlatMap(function () {})).to.be.false;
-        });
-    });
-
-    describe('makeProperty', function () {
-        it('should have a get property if the type is get', function () {
-            expect(common.makeProperty('get', common.noop)).to.have.property('get', common.noop);
-        });
-
-        it('should have a value property if the type is value', function () {
-            expect(common.makeProperty('value', common.noop)).to.have.property('value', common.noop);
-        });
-    });
-
     describe('assert', function () {
         it('should throw an error if assertion is false', function () {
             expect(function () {

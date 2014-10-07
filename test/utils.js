@@ -9,16 +9,16 @@ describe('Internal Utilities', function () {
 
     describe('hasFlatMap', function () {
         it('should return true on arrays', function () {
-            expect(utils.hasFlatMap([])).to.be.true;
+            utils.hasFlatMap([]).should.be.true;
         });
 
         it('should return true on maybes', function () {
-            expect(utils.hasFlatMap(functionalify.Maybe(1))).to.be.true;
+            utils.hasFlatMap(functionalify.Maybe(1)).should.be.true;
         });
 
         it('should return false on any function where flatmap is unavailable', function () {
-            expect(utils.hasFlatMap({})).to.be.false;
-            expect(utils.hasFlatMap(function () {})).to.be.false;
+            utils.hasFlatMap({}).should.be.false;
+            utils.hasFlatMap(function () {}).should.be.false;
         });
     });
 

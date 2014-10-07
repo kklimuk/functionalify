@@ -94,9 +94,7 @@ describe('Array', function () {
                 var maybes = [Maybe(1), Maybe(null), Maybe(), Maybe(2)];
                 maybes.flatMap(function (value) {
                     return value * 5;
-                }).map(function (maybe) {
-                    return maybe.getOrElse('');
-                }).should.include.members([5, '', 10]);
+                }).should.include.members([5, 10]);
             });
         });
     });
@@ -362,7 +360,7 @@ describe('Array', function () {
                 result(1).should.have.members([1, 3, 5, 7, 9]);
             });
 
-            it('should crate an empty hashmap if the initial array is empty', function () {
+            it('should create an empty hashmap if the initial array is empty', function () {
                 [].groupBy(function (iter) {
                     return iter % 2;
                 }).size.should.equal(0);

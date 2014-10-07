@@ -1,4 +1,5 @@
 require('./array');
+var tools = require('./common');
 
 /*
  Credit for the type retrieval function and regex
@@ -75,9 +76,41 @@ nativeHashing.getKeyFrom = function (key, from) {
     return from[primitiveUniqueId(key)];
 };
 
+function hasFlatMap(val) {
+    return (typeof val === "object" || typeof val === "function") && typeof val.flatMap === "function";
+}
+
 module.exports = {
-    hasFlatMap: function (val) {
-        return (typeof val === "object" || typeof val === "function") && typeof val.flatMap === "function";
+    hasFlatMap: hasFlatMap,
+
+    commonFlatMap: function (elements, func) {
+        var result = [];
+
+        for (var i = 0, length = elements.length; i < length; i++) {
+            var element = elements[i];
+
+            if (hasFlatMap(elements[i])) {
+                if (tools.exists(element.__elements__)) {
+                    result.push.apply(result, element.__elements__.flatMap(func));
+                    continue;
+                }
+
+                if (element.__elements__ === null) {
+                    continue;
+                }
+
+                var mapped = element.flatMap(func);
+                if (mapped.length) {
+                    result.push.apply(result, mapped);
+                } else {
+                    result.push(mapped);
+                }
+            } else {
+                result.push(func(element));
+            }
+        }
+
+        return result;
     },
 
     makeProperty: function (type, func) {

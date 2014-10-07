@@ -17,7 +17,7 @@ function Some(value) {
     };
 
     return Object.create(Some.prototype, {
-        "value": { value: value, enumerable: true },
+        "__elements__": { value: [value], enumerable: true },
         "map": {
             value: function (func) {
                 return Maybe(func(value));
@@ -41,6 +41,7 @@ var self = function () {
     return this;
 };
 var none = Object.create(None.prototype, {
+    __elements__: { value: null, enumerable: true },
     map: { value: self },
     flatMap: { value: self },
     filter: { value: self },

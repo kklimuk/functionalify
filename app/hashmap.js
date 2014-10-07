@@ -5,46 +5,57 @@ var Maybe = require('./maybe'),
 require('./array');
 
 function Map() {
+    var keys = [];
     var pairs = Array.prototype.reduce.call(arguments, function (acc, pair) {
         if (!Array.isArray(pair) && typeof pair === 'object') {
-            acc.push.apply(acc, Object.unzip(pair));
+            var unzipped = Object.unzip(pair);
+            keys.push.apply(keys, unzipped.map(function (pair) {
+                return pair[0];
+            }));
+            acc.push.apply(acc, unzipped);
         } else {
             functools.assert(Array.isArray(pair), "The input is neither an array or object");
             functools.assert(pair.length, "The input pair array must have a length of 2");
-            acc.push(pair);
+
+            if (keys.indexOf(pair[0]) === -1) {
+                keys.push(pair[0]);
+                acc.push(pair);
+            }
         }
 
         return acc;
     }, []);
 
     var hashCodeMap = nativeHashing(pairs);
-    return wrapApplyFunctionMap.call(null, pairs, function (key) {
+    hashCodeMap.__elements__ = pairs;
+    return wrapApplyFunctionMap.call(null, hashCodeMap, function (key) {
         return nativeHashing.getKeyFrom(key, hashCodeMap);
     });
 }
 
-function wrapApplyFunctionMap(pairs, func) {
+function wrapApplyFunctionMap(hashCodeMap, func) {
     Object.defineProperties(func, {
         "add": {
             value: function (pair) {
-                return Map.apply(null, pairs.immutableAppend(pair));
+                return Map.apply(null, hashCodeMap.__elements__.immutableAppend(pair));
             }
         },
 
+        "__elements__": { value: hashCodeMap.__elements__, enumerable: true },
+
         "getMaybe": {
             value: function (key) {
-                try {
-                    return Maybe(func(key));
-                } catch (error) {
-                    return Maybe.None();
-                }
+                return Maybe(func(key));
             }
         },
 
         "size": {
-            value: pairs.length
-        }
+            value: hashCodeMap.__elements__.length
+        },
+
+        "iterator": { value: hashCodeMap.__elements__ }
     });
+
     return func;
 }
 
